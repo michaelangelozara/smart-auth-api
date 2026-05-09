@@ -1,0 +1,29 @@
+services:
+  smartauth.webapi:
+    image: ${DOCKER_REGISTRY-}smartauthwebapi
+    container_name: SmartAuth.Api
+    build:
+      context: .
+      dockerfile: SmartAuth.WebAPI/Dockerfile
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - 5000:80
+    depends_on:
+      - smartauth.database
+
+  smartauth.database:
+    image: postgres:latest
+    container_name: SmartAuth.Database
+    environment:
+      - POSTGRES_DB=smart_auth_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - smartauth-db:/var/lib/postgresql
+    ports:
+      - 5432:5432
+
+volumes:
+  smartauth-db:

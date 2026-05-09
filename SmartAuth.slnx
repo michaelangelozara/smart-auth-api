@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="SmartAuth.Application/SmartAuth.Application.csproj" />
+    <Project Path="SmartAuth.Domain/SmartAuth.Domain.csproj" />
+    <Project Path="SmartAuth.Infrastructure/SmartAuth.Infrastructure.csproj" />
+    <Project Path="SmartAuth.SharedKernel/SmartAuth.SharedKernel.csproj" />
+    <Project Path="SmartAuth.WebAPI/SmartAuth.WebAPI.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="SmartAuth.UnitTests/SmartAuth.UnitTests.csproj" />
+  </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+</Solution>
