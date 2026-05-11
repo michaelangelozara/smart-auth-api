@@ -13,7 +13,6 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
         builder.HasKey(x => x.Name);
 
         builder.Property(x => x.Name)
-            .HasColumnName("name")
             .HasMaxLength(50)
             .IsRequired();
 

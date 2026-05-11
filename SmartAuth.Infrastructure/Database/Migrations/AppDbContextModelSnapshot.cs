@@ -17,7 +17,7 @@ namespace SmartAuth.Infrastructure.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -29,7 +29,8 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("name");
 
-                    b.HasKey("Name");
+                    b.HasKey("Name")
+                        .HasName("pk_permissions");
 
                     b.ToTable("permissions", (string)null);
 
@@ -63,7 +64,8 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("name");
 
-                    b.HasKey("Name");
+                    b.HasKey("Name")
+                        .HasName("pk_roles");
 
                     b.ToTable("roles", (string)null);
 
@@ -83,16 +85,18 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                     b.Property<string>("RoleName")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("role");
+                        .HasColumnName("role_name");
 
                     b.Property<string>("PermissionCode")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("permission_code");
 
-                    b.HasKey("RoleName", "PermissionCode");
+                    b.HasKey("RoleName", "PermissionCode")
+                        .HasName("pk_role_permissions");
 
-                    b.HasIndex("PermissionCode");
+                    b.HasIndex("PermissionCode")
+                        .HasDatabaseName("ix_role_permissions_permission_code");
 
                     b.ToTable("role_permissions", (string)null);
 
@@ -132,8 +136,14 @@ namespace SmartAuth.Infrastructure.Database.Migrations
             modelBuilder.Entity("SmartAuth.Domain.Users.User", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("email");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -143,8 +153,8 @@ namespace SmartAuth.Infrastructure.Database.Migrations
 
                     b.Property<string>("IdentityId")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("identity_id");
 
                     b.Property<string>("LastName")
@@ -158,10 +168,16 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("middle_name");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_users");
+
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_email");
 
                     b.HasIndex("IdentityId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_identity_id");
 
                     b.ToTable("users", (string)null);
                 });
@@ -177,9 +193,11 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("name");
 
-                    b.HasKey("UserId", "RoleName");
+                    b.HasKey("UserId", "RoleName")
+                        .HasName("pk_user_roles");
 
-                    b.HasIndex("RoleName");
+                    b.HasIndex("RoleName")
+                        .HasDatabaseName("ix_user_roles_role_name");
 
                     b.ToTable("user_roles", (string)null);
                 });
@@ -190,13 +208,15 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                         .WithMany()
                         .HasForeignKey("PermissionCode")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_role_permissions_permissions_permission_code");
 
                     b.HasOne("SmartAuth.Domain.Users.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleName")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_role_permissions_roles_role_name");
 
                     b.Navigation("Permission");
 
@@ -209,13 +229,15 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                         .WithMany()
                         .HasForeignKey("RoleName")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_user_roles_roles_role_name");
 
                     b.HasOne("SmartAuth.Domain.Users.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_user_roles_users_user_id");
 
                     b.Navigation("Role");
 

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EFCore.NamingConventions" Version="10.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -16,6 +17,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SmartAuth.Application\SmartAuth.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Extentions/" />
+    <Folder Include="Identity/" />
   </ItemGroup>
 
 </Project>

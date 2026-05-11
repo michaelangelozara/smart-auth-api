@@ -1,7 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using SmartAuth.Application;
 using SmartAuth.Infrastructure;
-using SmartAuth.Infrastructure.Database;
+using SmartAuth.Infrastructure.Extentions;
 using SmartAuth.WebAPI;
 using SmartAuth.WebAPI.Extensions;
 
@@ -16,14 +15,11 @@ builder.Services
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseScalar();
 
-    using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    context.Database.Migrate();
+    app.UseMigration();
 }
 
 app.MapEndpoints();

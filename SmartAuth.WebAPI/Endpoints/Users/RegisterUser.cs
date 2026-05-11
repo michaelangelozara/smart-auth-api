@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using SmartAuth.Application.Features.Users.Register;
+using SmartAuth.SharedKernel;
 using SmartAuth.WebAPI.Constants;
 using SmartAuth.WebAPI.Extensions;
 using SmartAuth.WebAPI.Infrastructure;
@@ -12,11 +13,11 @@ public class RegisterUser : IEndpoint
     {
         app.MapPost("/users", async (Request request, ISender sender) =>
         {
-            var result = await sender.Send(new RegisterUserCommand(
+            Result<Guid> result = await sender.Send(new RegisterUserCommand(
                 request.FirstName,
                 request.MiddleName,
                 request.LastName,
-                request.Username,
+                request.Email,
                 request.Email,
                 request.Password));
 
@@ -34,8 +35,6 @@ internal sealed class Request
     public string? MiddleName { get; init; }
     
     public string LastName { get; init; } = null!;
-
-    public string Username { get; init; } = null!;
 
     public string Email { get; init; } = null!;
 

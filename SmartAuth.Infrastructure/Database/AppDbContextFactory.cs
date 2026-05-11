@@ -15,12 +15,13 @@ internal class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
             .AddJsonFile("appsettings.Development.json", optional: true)
             .Build();
 
-        var connectionString = configuration.GetConnectionString("DB");
+        var connectionString = configuration.GetConnectionString("Database");
         if (string.IsNullOrEmpty(connectionString))
             throw new InvalidOperationException("Database connection string is not configured.");
 
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-        optionsBuilder.UseNpgsql(connectionString);
+        optionsBuilder.UseNpgsql(connectionString)
+            .UseSnakeCaseNamingConvention();
 
         return new AppDbContext(optionsBuilder.Options);
     }

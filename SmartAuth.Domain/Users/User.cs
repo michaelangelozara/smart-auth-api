@@ -17,33 +17,20 @@ public sealed class User
     
     public string LastName { get; private set; } = null!;
 
+    public string Email { get; private set; } = null!;
+
     public string IdentityId { get; private set; } = null!;
 
-    public static Result<User> Create(string firstName, string? middleName, string lastName, string identityId)
+    public static User Create(string firstName, string? middleName, string lastName, string email, string identityId)
     {
-        if (string.IsNullOrWhiteSpace(firstName))
+        return new User
         {
-            return Result.Failure<User>(Error.Validation("Users.Validation", "First name cannot be null or empty."));
-        }
-        
-        if (string.IsNullOrWhiteSpace(lastName))
-        {
-            return Result.Failure<User>(Error.Validation("Users.Validation", "Last name cannot be null or empty."));
-        }
-
-        if (string.IsNullOrWhiteSpace(identityId))
-        {
-            throw new DomainException("Identity id cannot be null or empty.");
-        }
-        
-        var user = new User
-        {
+            Id = Guid.NewGuid(),
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
+            Email = email,
             IdentityId = identityId
         };
-
-        return Result.Success(user);
     }
 }

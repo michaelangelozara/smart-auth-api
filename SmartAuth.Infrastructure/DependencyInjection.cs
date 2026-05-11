@@ -11,6 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 using SmartAuth.Domain.Users;
 using SmartAuth.Infrastructure.Database.Repositories;
 using SmartAuth.Application.Abstractions.Data;
+using SmartAuth.Application.Abstractions.Identity;
+using SmartAuth.Infrastructure.Identity;
+using Microsoft.Extensions.Options;
 
 namespace SmartAuth.Infrastructure;
 
@@ -23,25 +26,38 @@ public static class DependencyInjection
             .AddHealthChecks(configuration)
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal()
-            .AddRepositories();
+            .AddRepositories()
+            .AddOptions(configuration);
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+
+        services.AddTransient<IIdentityProviderService, IdentityProviderService>();
+
+        services.AddTransient<KeyCloakAuthDelegatingHandler>();
+
+        services
+            .AddHttpClient<KeyCloakClient>((sp, httpClient) =>
+            {
+                KeyCloakOptions keyCloakOptions = sp.GetRequiredService<IOptions<KeyCloakOptions>>().Value;
+                
+                httpClient.BaseAddress = new Uri(keyCloakOptions.AdminUrl);
+            })
+            .AddHttpMessageHandler<KeyCloakAuthDelegatingHandler>();
 
         return services;
     }
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        string? dbConnection = configuration.GetConnectionString("DB");
+        string? dbConnection = configuration.GetConnectionString("Database");
         if (dbConnection is null)
             throw new InvalidOperationException("Database connection string is not configured.");
 
-        services.AddDbContext<AppDbContext>(options =>
-        {
-            options.UseNpgsql(dbConnection);
-        });
+        services.AddDbContext<AppDbContext>(options => 
+            options.UseNpgsql(dbConnection)
+                .UseSnakeCaseNamingConvention());
 
         return services;
     }
@@ -89,6 +105,19 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
+
+        return services;
+    }
+
+    private static IServiceCollection AddOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        IConfigurationSection keyCloakConfigurationSection = configuration.GetSection("KeyCloak");
+        if (!keyCloakConfigurationSection.Exists())
+        {
+            throw new InvalidOperationException("Keycloak is not configured.");
+        }
+
+        services.Configure<KeyCloakOptions>(keyCloakConfigurationSection);
 
         return services;
     }

@@ -10,9 +10,10 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
     {
         builder.ToTable("permissions");
         builder.HasKey(x => x.Name);
+        builder.Property(x => x.Name)
+            .ValueGeneratedNever();
 
         builder.Property(x => x.Name)
-            .HasColumnName("name")
             .HasMaxLength(50)
             .IsRequired();
 

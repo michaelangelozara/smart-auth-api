@@ -12,12 +12,10 @@ public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermissi
         builder.HasKey(x => new {x.RoleName, x.PermissionCode});
 
         builder.Property(x => x.RoleName)
-            .HasColumnName("role")
             .HasMaxLength(50)
             .IsRequired();
 
         builder.Property(x => x.PermissionCode)
-            .HasColumnName("permission_code")
             .HasMaxLength(50)
             .IsRequired();
 

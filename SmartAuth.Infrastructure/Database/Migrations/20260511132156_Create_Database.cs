@@ -21,7 +21,7 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_permissions", x => x.name);
+                    table.PrimaryKey("pk_permissions", x => x.name);
                 });
 
             migrationBuilder.CreateTable(
@@ -32,43 +32,44 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_roles", x => x.name);
+                    table.PrimaryKey("pk_roles", x => x.name);
                 });
 
             migrationBuilder.CreateTable(
                 name: "users",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     first_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     middle_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     last_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    identity_id = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false)
+                    email = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    identity_id = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_users", x => x.Id);
+                    table.PrimaryKey("pk_users", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "role_permissions",
                 columns: table => new
                 {
-                    role = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    role_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     permission_code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_role_permissions", x => new { x.role, x.permission_code });
+                    table.PrimaryKey("pk_role_permissions", x => new { x.role_name, x.permission_code });
                     table.ForeignKey(
-                        name: "FK_role_permissions_permissions_permission_code",
+                        name: "fk_role_permissions_permissions_permission_code",
                         column: x => x.permission_code,
                         principalTable: "permissions",
                         principalColumn: "name",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_role_permissions_roles_role",
-                        column: x => x.role,
+                        name: "fk_role_permissions_roles_role_name",
+                        column: x => x.role_name,
                         principalTable: "roles",
                         principalColumn: "name",
                         onDelete: ReferentialAction.Cascade);
@@ -83,18 +84,18 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_user_roles", x => new { x.user_id, x.name });
+                    table.PrimaryKey("pk_user_roles", x => new { x.user_id, x.name });
                     table.ForeignKey(
-                        name: "FK_user_roles_roles_name",
+                        name: "fk_user_roles_roles_role_name",
                         column: x => x.name,
                         principalTable: "roles",
                         principalColumn: "name",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_user_roles_users_user_id",
+                        name: "fk_user_roles_users_user_id",
                         column: x => x.user_id,
                         principalTable: "users",
-                        principalColumn: "Id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -121,7 +122,7 @@ namespace SmartAuth.Infrastructure.Database.Migrations
 
             migrationBuilder.InsertData(
                 table: "role_permissions",
-                columns: new[] { "permission_code", "role" },
+                columns: new[] { "permission_code", "role_name" },
                 values: new object[,]
                 {
                     { "users:create", "Administrator" },
@@ -133,17 +134,23 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_role_permissions_permission_code",
+                name: "ix_role_permissions_permission_code",
                 table: "role_permissions",
                 column: "permission_code");
 
             migrationBuilder.CreateIndex(
-                name: "IX_user_roles_name",
+                name: "ix_user_roles_role_name",
                 table: "user_roles",
                 column: "name");
 
             migrationBuilder.CreateIndex(
-                name: "IX_users_identity_id",
+                name: "ix_users_email",
+                table: "users",
+                column: "email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_identity_id",
                 table: "users",
                 column: "identity_id",
                 unique: true);
