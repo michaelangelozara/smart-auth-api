@@ -42,7 +42,8 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     first_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     middle_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    last_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
+                    last_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    identity_id = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -140,6 +141,12 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                 name: "IX_user_roles_name",
                 table: "user_roles",
                 column: "name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_users_identity_id",
+                table: "users",
+                column: "identity_id",
+                unique: true);
         }
 
         /// <inheritdoc />

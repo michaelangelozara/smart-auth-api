@@ -4,7 +4,6 @@ using SmartAuth.Infrastructure.Authorization;
 using SmartAuth.Infrastructure.Database;
 using SmartAuth.Infrastructure.Time;
 using SmartAuth.SharedKernel;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -56,26 +55,12 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(o =>
-            {
-                //o.RequireHttpsMetadata = false; // this should be disabled only in development environment
-                //o.TokenValidationParameters = new TokenValidationParameters
-                //{
-                //    ValidateIssuerSigningKey = true,
-                //    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!)),
-                //    ValidateIssuer = true,
-                //    ValidIssuer = configuration["Jwt:Issuer"],
-                //    ValidateAudience = true,
-                //    ValidAudience = configuration["Jwt:Audience"],
-                //    ValidateLifetime = true,
-                //    ClockSkew = TimeSpan.Zero,
-                //    RoleClaimType = ClaimTypes.Role
-                //};
-            });
+        services.AddAuthentication().AddJwtBearer();
+        services.ConfigureOptions<JwtBearerConfigureOptions>();
 
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContext, UserContext>();
+
         
         return services;
     }

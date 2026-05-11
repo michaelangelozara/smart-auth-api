@@ -26,12 +26,10 @@ if (app.Environment.IsDevelopment())
     context.Database.Migrate();
 }
 
-app.UseHttpsRedirection();
+app.MapEndpoints();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
-
-app.MapEndpoints();
 
 app.Run();

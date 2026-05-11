@@ -25,5 +25,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnName("last_name")
             .HasMaxLength(100)
             .IsRequired();
+
+        builder.Property(x => x.IdentityId)
+            .HasColumnName("identity_id")
+            .HasMaxLength(256)
+            .IsRequired();
+
+        builder.HasIndex(x => x.IdentityId)
+            .IsUnique();
     }
 }

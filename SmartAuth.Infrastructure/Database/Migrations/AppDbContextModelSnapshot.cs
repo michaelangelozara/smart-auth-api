@@ -141,6 +141,12 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("first_name");
 
+                    b.Property<string>("IdentityId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("identity_id");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -153,6 +159,9 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                         .HasColumnName("middle_name");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IdentityId")
+                        .IsUnique();
 
                     b.ToTable("users", (string)null);
                 });
