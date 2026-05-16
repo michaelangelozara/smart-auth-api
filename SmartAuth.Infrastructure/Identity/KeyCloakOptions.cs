@@ -13,4 +13,7 @@ public class KeyCloakOptions
     public string ConfidentialClientSecret { get; set; } = null!;
 
     public string PublicClientId { get; set; } = null!;
+
+    public string RedirectUri { get; set; } = null!;
+
 }

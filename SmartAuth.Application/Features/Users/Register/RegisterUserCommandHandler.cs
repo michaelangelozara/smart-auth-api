@@ -28,6 +28,8 @@ public class RegisterUserCommandHandler(
             return Result.Failure<Guid>(result.Error);
         }
 
+        TokenResponse tokenResponse = await identityProviderService.AuthenticateAsync(request.Username, request.Password, cancellationToken);
+
         var user = User.Create(
             request.FirstName, 
             request.MiddleName, 
@@ -35,10 +37,17 @@ public class RegisterUserCommandHandler(
             request.Email,
             result.Value);
 
+        Guid sessionId = user.AddSession(
+            tokenResponse.AccessToken, 
+            tokenResponse.ExpiresIn, 
+            tokenResponse.RefreshToken, 
+            tokenResponse.RefreshExpiresIn, 
+            user.Id);
+
         await userRepository.InsertAsync(user);
         
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return user.Id;
+        return sessionId;
     }
 }

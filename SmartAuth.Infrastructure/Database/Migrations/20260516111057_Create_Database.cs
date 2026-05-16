@@ -76,6 +76,29 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "sessions",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    access_token = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: false),
+                    access_token_expiration = table.Column<DateTime>(type: "timestamptz", nullable: false),
+                    refresh_token = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: false),
+                    refresh_token_expiration = table.Column<DateTime>(type: "timestamptz", nullable: false),
+                    revoked = table.Column<bool>(type: "boolean", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_sessions", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_sessions_users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "user_roles",
                 columns: table => new
                 {
@@ -139,6 +162,11 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                 column: "permission_code");
 
             migrationBuilder.CreateIndex(
+                name: "ix_sessions_user_id",
+                table: "sessions",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_user_roles_role_name",
                 table: "user_roles",
                 column: "name");
@@ -161,6 +189,9 @@ namespace SmartAuth.Infrastructure.Database.Migrations
         {
             migrationBuilder.DropTable(
                 name: "role_permissions");
+
+            migrationBuilder.DropTable(
+                name: "sessions");
 
             migrationBuilder.DropTable(
                 name: "user_roles");

@@ -19,4 +19,8 @@
     <ProjectReference Include="..\SmartAuth.Infrastructure\SmartAuth.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Endpoints/Auth/" />
+  </ItemGroup>
+
 </Project>

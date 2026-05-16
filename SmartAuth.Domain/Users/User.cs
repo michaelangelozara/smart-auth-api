@@ -1,9 +1,9 @@
-﻿using SmartAuth.Domain.Exceptions;
+﻿using SmartAuth.Domain.Sessions;
 using SmartAuth.SharedKernel;
 
 namespace SmartAuth.Domain.Users;
 
-public sealed class User
+public sealed class User : Entity
 {
     private User()
     {
@@ -21,6 +21,8 @@ public sealed class User
 
     public string IdentityId { get; private set; } = null!;
 
+    public ICollection<Session> Sessions { get; private set; } = [];
+
     public static User Create(string firstName, string? middleName, string lastName, string email, string identityId)
     {
         return new User
@@ -32,5 +34,24 @@ public sealed class User
             Email = email,
             IdentityId = identityId
         };
+    }
+
+    public Guid AddSession(
+        string accessToken,
+        int accessTokenExpiration,
+        string refreshToken,
+        int refreshTokenExpiration,
+        Guid userId)
+    {
+        var session = Session.Create(
+            accessToken, 
+            accessTokenExpiration, 
+            refreshToken, 
+            refreshTokenExpiration, 
+            userId);
+        
+        Sessions.Add(session);
+
+        return session.Id;
     }
 }

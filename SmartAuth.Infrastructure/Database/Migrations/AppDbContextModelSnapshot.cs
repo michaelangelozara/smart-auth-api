@@ -22,6 +22,50 @@ namespace SmartAuth.Infrastructure.Database.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("SmartAuth.Domain.Sessions.Session", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("AccessToken")
+                        .IsRequired()
+                        .HasMaxLength(3000)
+                        .HasColumnType("character varying(3000)")
+                        .HasColumnName("access_token");
+
+                    b.Property<DateTime>("AccessTokenExpiration")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("access_token_expiration");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasMaxLength(3000)
+                        .HasColumnType("character varying(3000)")
+                        .HasColumnName("refresh_token");
+
+                    b.Property<DateTime>("RefreshTokenExpiration")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("refresh_token_expiration");
+
+                    b.Property<bool>("Revoked")
+                        .HasColumnType("boolean")
+                        .HasColumnName("revoked");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sessions");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_sessions_user_id");
+
+                    b.ToTable("sessions", (string)null);
+                });
+
             modelBuilder.Entity("SmartAuth.Domain.Users.Permission", b =>
                 {
                     b.Property<string>("Name")
@@ -202,6 +246,18 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                     b.ToTable("user_roles", (string)null);
                 });
 
+            modelBuilder.Entity("SmartAuth.Domain.Sessions.Session", b =>
+                {
+                    b.HasOne("SmartAuth.Domain.Users.User", "User")
+                        .WithMany("Sessions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sessions_users_user_id");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SmartAuth.Domain.Users.RolePermission", b =>
                 {
                     b.HasOne("SmartAuth.Domain.Users.Permission", "Permission")
@@ -242,6 +298,11 @@ namespace SmartAuth.Infrastructure.Database.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SmartAuth.Domain.Users.User", b =>
+                {
+                    b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618
         }

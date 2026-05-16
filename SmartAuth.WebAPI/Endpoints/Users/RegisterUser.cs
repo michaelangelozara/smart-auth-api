@@ -11,7 +11,7 @@ public class RegisterUser : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/users", async (Request request, ISender sender) =>
+        app.MapPost("/users", async (Request request, ISender sender, HttpResponse httpResponse) =>
         {
             Result<Guid> result = await sender.Send(new RegisterUserCommand(
                 request.FirstName,
@@ -21,7 +21,12 @@ public class RegisterUser : IEndpoint
                 request.Email,
                 request.Password));
 
-            return result.Match(Results.Ok, CustomResults.Problem);
+            return result.Match(id =>
+            {
+                httpResponse.SetCookie("session_id", $"{id}", 168); // 7 days expiration
+
+                return Results.Ok("User succesfully registered.");
+            }, CustomResults.Problem);
         })
             .WithTags(Tags.Users)
             .AllowAnonymous();
