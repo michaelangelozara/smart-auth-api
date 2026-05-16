@@ -25,7 +25,6 @@ namespace SmartAuth.Infrastructure.Database.Migrations
             modelBuilder.Entity("SmartAuth.Domain.Sessions.Session", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 

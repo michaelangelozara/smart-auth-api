@@ -10,6 +10,8 @@ public sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
     {
         builder.ToTable("sessions");
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .ValueGeneratedNever();
 
         builder.Property(x => x.AccessToken)
             .HasMaxLength(3000)

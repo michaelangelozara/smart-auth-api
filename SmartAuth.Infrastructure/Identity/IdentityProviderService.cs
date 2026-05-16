@@ -67,11 +67,11 @@ public sealed class IdentityProviderService(
 
         if(!response.IsSuccessStatusCode)
         {
-            return Result.Failure<TokenResponse>(IdentityProviderErrors.CodeIsInvalid);
+            throw new InvalidOperationException("Keycloak exchange code failed.");
         }
 
         string json = await response.Content.ReadAsStringAsync(cancellationToken);
-        var tokens = JsonSerializer.Deserialize<TokenResponse>(json);
+        TokenResponse tokens = JsonSerializer.Deserialize<TokenResponse>(json)!;
 
         return tokens;
     }

@@ -8,31 +8,46 @@ namespace SmartAuth.Application.Features.Auth.ExchangeCode;
 
 public class ExchangeCodeCommandHandler(
     IIdentityProviderService identityProviderService,
-    // ISessionRepository sessionRepository,
     IUserRepository userRepository,
     IUnitOfWork unitOfWork) 
     : IRequestHandler<ExchangeCodeCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(ExchangeCodeCommand request, CancellationToken cancellationToken)
     {
-        var identityResult = await identityProviderService.ExchangeCodeAsync(request.Code, cancellationToken);
+        Result<TokenResponse> identityResult = await identityProviderService.ExchangeCodeAsync(request.Code, cancellationToken);
 
         if (identityResult.IsFailure)
         {
             return Result.Failure<Guid>(identityResult.Error);
         }
 
-        var tokenResponse = identityResult.Value;
+        TokenResponse tokenResponse = identityResult.Value;
 
-        var claims = identityProviderService.ExtractClaim(tokenResponse.AccessToken);
+        JwtClaims claims = identityProviderService.ExtractClaim(tokenResponse.AccessToken);
 
-        var user = await userRepository.FindAsync(claims.IdentityId);
-    
+        User? user = await userRepository.FindAsync(claims.IdentityId);
+        
+        if(user is null)
+        {
+            user = User.Create(
+                claims.FirstName, 
+                "", 
+                claims.LastName,
+                claims.Email,
+                claims.IdentityId);
 
-        // await sessionRepository.InsertAsync(session);
+            await userRepository.InsertAsync(user);
+        }
+
+         Guid sessionId = user.AddSession(
+                tokenResponse.AccessToken, 
+                tokenResponse.ExpiresIn,
+                tokenResponse.RefreshToken, 
+                tokenResponse.RefreshExpiresIn, 
+                user.Id);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Guid.NewGuid();
+        return sessionId;
     }
 }

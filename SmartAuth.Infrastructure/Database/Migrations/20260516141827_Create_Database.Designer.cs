@@ -12,7 +12,7 @@ using SmartAuth.Infrastructure.Database;
 namespace SmartAuth.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260516111057_Create_Database")]
+    [Migration("20260516141827_Create_Database")]
     partial class Create_Database
     {
         /// <inheritdoc />
@@ -28,7 +28,6 @@ namespace SmartAuth.Infrastructure.Database.Migrations
             modelBuilder.Entity("SmartAuth.Domain.Sessions.Session", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
