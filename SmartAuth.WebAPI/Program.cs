@@ -22,11 +22,10 @@ if (app.Environment.IsDevelopment())
     app.UseMigration();
 }
 
+app.MapEndpoints();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
-
-app.MapEndpoints();
 
 app.Run();

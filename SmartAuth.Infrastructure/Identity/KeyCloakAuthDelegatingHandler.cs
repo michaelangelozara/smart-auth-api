@@ -42,7 +42,7 @@ public class KeyCloakAuthDelegatingHandler(IOptions<KeyCloakOptions> options) : 
 
         authorizationResponse.EnsureSuccessStatusCode();
 
-        return await authorizationResponse.Content.ReadFromJsonAsync<AuthToken>(cancellationToken);
+        return (await authorizationResponse.Content.ReadFromJsonAsync<AuthToken>(cancellationToken))!;
     }
 
     internal sealed class AuthToken

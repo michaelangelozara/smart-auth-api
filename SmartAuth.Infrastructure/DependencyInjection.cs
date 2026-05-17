@@ -14,6 +14,9 @@ using SmartAuth.Application.Abstractions.Data;
 using SmartAuth.Application.Abstractions.Identity;
 using SmartAuth.Infrastructure.Identity;
 using Microsoft.Extensions.Options;
+using SmartAuth.Application.Abstractions.TokenValidator;
+using SmartAuth.Infrastructure.TokenValidator;
+using SmartAuth.Domain.Sessions;
 
 namespace SmartAuth.Infrastructure;
 
@@ -24,7 +27,7 @@ public static class DependencyInjection
             .AddServices()
             .AddDatabase(configuration)
             .AddHealthChecks(configuration)
-            .AddAuthenticationInternal(configuration)
+            .AddAuthenticationInternal()
             .AddAuthorizationInternal()
             .AddRepositories()
             .AddOptions(configuration);
@@ -68,16 +71,23 @@ public static class DependencyInjection
     }
 
     private static IServiceCollection AddAuthenticationInternal(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
-        services.AddAuthentication().AddJwtBearer();
-        services.ConfigureOptions<JwtBearerConfigureOptions>();
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = SessionAuthDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = SessionAuthDefaults.AuthenticationScheme;
+            options.DefaultForbidScheme = SessionAuthDefaults.AuthenticationScheme;
+        })
+        .AddScheme<SessionAuthOptions, SessionAuthHandler>(
+            SessionAuthDefaults.AuthenticationScheme, 
+            _ => { });
 
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContext, UserContext>();
 
-        
+        services.AddSingleton<ITokenValidator, KeycloakTokenValidator>();
+
         return services;
     }
 
@@ -103,6 +113,7 @@ public static class DependencyInjection
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ISessionRepository, SessionRepository>();
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
 

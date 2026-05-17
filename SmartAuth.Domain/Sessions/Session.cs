@@ -42,4 +42,6 @@ public sealed class Session
           UserId = userId
         };
     }
+
+    public bool AccessTokenExpirationValid(DateTime now) => AccessTokenExpiration > now;
 }

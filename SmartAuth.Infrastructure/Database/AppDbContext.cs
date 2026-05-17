@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using SmartAuth.Application.Abstractions.Data;
+using SmartAuth.Domain.Sessions;
 
 namespace SmartAuth.Infrastructure.Database;
 
@@ -17,6 +18,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<UserRole> UserRoles { get; private set; }
 
     public DbSet<RolePermission> RolePermissions { get; private set; }
+
+    public DbSet<Session> Sessions { get; private set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -11,12 +11,9 @@ internal sealed class PermissionAuthorizationHandler(IServiceScopeFactory servic
         AuthorizationHandlerContext context,
         PermissionRequirement requirement)
     {
-        // TODO: You definitely want to reject unauthenticated users here.
-        if (context.User is { Identity.IsAuthenticated: true })
+        if (context.User is {Identity.IsAuthenticated : false})
         {
-            // TODO: Remove this call when you implement the PermissionProvider.GetForUserIdAsync
-            context.Succeed(requirement);
-
+            context.Fail(new AuthorizationFailureReason(this, "User is not authenticated."));
             return;
         }
 
@@ -29,8 +26,9 @@ internal sealed class PermissionAuthorizationHandler(IServiceScopeFactory servic
         HashSet<string> permissions = await permissionProvider.GetForUserIdAsync(userId);
 
         if (permissions.Contains(requirement.Permission))
-        {
             context.Succeed(requirement);
-        }
+        else
+            context.Fail(new AuthorizationFailureReason(this,
+                $"Missing permission: {requirement.Permission}"));
     }
 }
